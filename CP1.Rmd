@@ -1,0 +1,87 @@
+---
+title: Investigate exponential distribution in R and compare it with the Central Limit
+  Theorem
+author: "Thimmaraju Rudrappa"
+date: "July 13, 2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+## Overview
+The objective is to investigate the exponential distribution
+and compare it to the Central Limit Theorem. 
+
+
+## Simulations
+Set variables lambda, exponentials, and seed.
+```{r}
+ECHO=TRUE
+set.seed(1337)
+lambda = 0.2
+exponentials = 40
+```
+
+Run Simulations 
+```{r}
+sMeans = NULL
+for (i in 1 : 1000) sMeans = c(sMeans, mean(rexp(exponentials, lambda)))
+```
+
+
+## Sample Mean Vs Theoretical Mean
+#### Sample Mean
+Calculate mean from the simulations with give the sample mean.
+```{r}
+mean(sMeans)
+```
+
+#### Theoretical Mean
+Theoretical mean of an exponential distribution is lambda^-1.
+```{r}
+lambda^-1
+```
+
+#### Comparison
+As we can see there is only a slight difference between the sample mean and the theoretical mean.
+```{r}
+abs(mean(sMeans)-lambda^-1)
+```
+
+
+## Sample Variance Vs Theoretical Variance
+#### Sample Variance
+Calculate the variance from the simulation means with give the sample
+variance.
+```{r}
+var(sMeans)
+```
+
+#### Theoretical Variance
+The theoretical variance of an exponential distribution is 
+(lambda * sqrt(n))^-2.
+```{r}
+(lambda * sqrt(exponentials))^-2
+```
+
+#### Comparison
+As we can see there is only a slight difference between the sample variance and theoretical variance.
+```{r}
+abs(var(sMeans)-(lambda * sqrt(exponentials))^-2)
+```
+
+
+## Distribution
+Density histogram of the 1000 simulations. There is an overlay with a 
+normal distribution that has a mean of lambda^-1 and standard deviation of 
+(lambda*sqrt(n))^-1, the theoretical normal distribution for the simulations.
+```{r}
+library(ggplot2)
+ggplot(data.frame(y=sMeans), aes(x=y)) + 
+  geom_histogram(aes(y=..density..), binwidth=0.2, fill="#0072B2", 
+                 color="black") +
+  stat_function(fun=dnorm, arg=list(mean=lambda^-1, 
+                                    sd=(lambda*sqrt(exponentials))^-1), 
+                size=2) +
+  labs(title="Plot of the Simulations", x="Simulation Mean")
+```
